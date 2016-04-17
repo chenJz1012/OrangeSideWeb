@@ -21,13 +21,7 @@ define("element", function (require, exports, module, undefined) {
     var isString = isType("String");
     var isArray = Array.isArray || isType("Array");
     var isFunction = isType("Function");
-
-    var Element = function () {
-        this.isElement = true;
-        this.attributes = {};
-        return this;
-    };
-    module.exports = Element;
+    var isJquery = isType("jQuery");
 
     var setAttribute = function (that, ele) {
         if (that.attributes.id != undefined)
@@ -107,7 +101,6 @@ define("element", function (require, exports, module, undefined) {
                 scroller.attr("data-rail-color", that.attributes.scrollRailColor);
             if (that.attributes.scrollHandleColor != undefined)
                 scroller.attr("data-handle-color", that.attributes.scrollHandleColor);
-
             portletBody.append(scroller);
         }
         return portletBody;
@@ -129,7 +122,36 @@ define("element", function (require, exports, module, undefined) {
     var initIcon = function (cls) {
         var icon = $('<i class="' + cls + '"></i>');
         return icon;
+    };
+
+    var initUl = function (cls) {
+        var ul = $('<ul></ul>');
+        if (cls != undefined) {
+            ul.addClass(cls);
+        }
+        return ul;
+    };
+    var initLi = function (cls) {
+        var li = $('<li></li>');
+        if (cls != undefined) {
+            li.addClass(cls);
+        }
+        return li;
     }
+    var initA = function (cls, text, url) {
+        var a = $('<a>' + text + '</a>');
+        if (cls != undefined) {
+            a.addClass(cls);
+        }
+        a.attr("href", (url == undefined ? "javascript:void(0);" : url));
+        return a;
+    }
+
+    var Element = function () {
+        this.isElement = true;
+        this.attributes = {};
+        return this;
+    };
 
     Element.prototype.common = function (innerOption) {
         var that = this;
@@ -138,9 +160,18 @@ define("element", function (require, exports, module, undefined) {
             if (innerOption.render.isElement) {
                 renderObject = innerOption.render.element;
             } else {
-                renderObject = $(innerOption.render);
+                renderObject = isJquery(innerOption.render) ? innerOption.render : $(innerOption.render);
             }
             this.element.appendTo(renderObject);
+        }
+        if (innerOption.preRender != undefined) {
+            var preRenderObject;
+            if (innerOption.preRender.isElement) {
+                preRenderObject = innerOption.preRender.element;
+            } else {
+                preRenderObject = isJquery(innerOption.preRender) ? innerOption.preRender : $(innerOption.preRender);
+            }
+            this.element.prependTo(preRenderObject);
         }
         if (innerOption.item != undefined) {
             var item = innerOption.item;
@@ -168,6 +199,22 @@ define("element", function (require, exports, module, undefined) {
             that.body.html(innerOption.html);
             return that;
         }
+        this.html = function (ele) {
+            if (ele.isElement) {
+                that.body.html(ele.element);
+            } else {
+                that.body.html(ele);
+            }
+            return that;
+        };
+        this.prepend = function (ele) {
+            if (ele.isElement) {
+                that.body.prepend(ele.element);
+            } else {
+                that.body.prepend(ele);
+            }
+            return that;
+        };
         this.append = function (ele) {
             if (ele.isElement) {
                 that.body.append(ele.element);
@@ -178,9 +225,17 @@ define("element", function (require, exports, module, undefined) {
         };
         this.appendTo = function (ele) {
             if (ele.isElement) {
-                that.body.appendTo(ele.body);
+                that.element.appendTo(ele.body);
             } else {
                 that.element.appendTo(ele);
+            }
+            return that;
+        };
+        this.prependTo = function (ele) {
+            if (ele.isElement) {
+                that.element.prependTo(ele.body);
+            } else {
+                that.element.prependTo(ele);
             }
             return that;
         };
@@ -188,7 +243,7 @@ define("element", function (require, exports, module, undefined) {
             var option = {
                 "type": type,
                 "message": msg
-            }
+            };
             var alert = new initAlert(option);
             that.body.prepend(alert);
             if (millions != undefined && millions > 0)
@@ -196,13 +251,13 @@ define("element", function (require, exports, module, undefined) {
             if (scrollTo)
                 Metronic.scrollTo(alert);
             return that;
-        }
+        };
         this.note = function (type, title, content) {
             var option = {
                 "type": type,
                 "title": title,
                 "content": content
-            }
+            };
             var note = new initNote(option);
             that.body.prepend(note);
             return that;
@@ -365,6 +420,34 @@ define("element", function (require, exports, module, undefined) {
         this.element = btnGroup;
         this.body = btnGroup;
         setAttribute(this, btnGroup);
+        this.common(this.attributes);
         return this;
     };
+
+    Element.prototype.breadcrumb = function (innerOption) {
+        this.attributes = innerOption || {};
+        var breadcrumb = initUl("page-breadcrumb breadcrumb");
+        var items = this.attributes.items;
+        $.each(items, function (i, data) {
+            var li = initLi();
+            if (data.active) {
+                li.addClass("active");
+                li.append(data.text);
+            } else {
+                var a = initA("", data.text, data.url);
+                li.append(a);
+            }
+            if (i < items.length - 1) {
+                var icon = initIcon("fa fa-angle-right");
+                li.append(icon);
+            }
+            breadcrumb.append(li);
+        });
+        this.element = breadcrumb;
+        this.body = breadcrumb;
+        setAttribute(this, breadcrumb);
+        this.common(this.attributes);
+        return this;
+    };
+    module.exports = Element;
 });

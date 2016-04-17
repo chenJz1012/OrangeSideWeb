@@ -11,7 +11,18 @@ define(function (require, exports, module, undefined) {
 });
 
 define("grid", function (require, exports, module, undefined) {
-    var element = require('./os-element');
+    function isType(type) {
+        return function (obj) {
+            return {}.toString.call(obj) == "[object " + type + "]"
+        }
+    }
+
+    var isObject = isType("Object");
+    var isString = isType("String");
+    var isArray = Array.isArray || isType("Array");
+    var isFunction = isType("Function");
+    var isJquery = isType("jQuery");
+    var element = require('os-element');
 
     var Grid = function (option) {
         this.renderEle = option.render == undefined ? $("body") : option.render
@@ -19,35 +30,13 @@ define("grid", function (require, exports, module, undefined) {
         return this;
     }
 
-    Grid.prototype.render = function () {
-        this.renderEle.append(this.self);
-    }
     Grid.prototype.init = function (option) {
-        var that = this;
-        this.self = element.build().portlet({
+        this.element = element.build().portlet({
             id: "grid",
-            title: "grid",
-            fullscreen: true,
-            render: that.renderEle
-        });
-        var button = element.build().button({
-            cls: "green-haze btn-circle",
-            icon: "fa fa-check",
-            text: "alertSuccess",
-            click: function () {
-                that.self.block();
-            }
-        });
-        this.self.append(button);
-        var button2 = element.build().button({
-            cls: "green-haze btn-circle",
-            icon: "fa fa-check",
-            text: "alertSuccess",
-            click: function () {
-                that.self.unBlock();
-            }
-        });
-        button2.appendTo(that.self);
+            title: "表格插件",
+            fullscreen: true
+        }).appendTo(this.renderEle);
+
     }
 
     module.exports = Grid;

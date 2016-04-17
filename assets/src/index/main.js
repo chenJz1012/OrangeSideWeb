@@ -2,15 +2,38 @@
  * Created by cgj on 2016/4/16.
  */
 define(function (require) {
+
+
+    var element = require("os-element");
+
+    var breadcrumb = element.build().breadcrumb({
+        preRender: "div.page-content > div.container",
+        items: [{
+            text: "Index",
+            url: "#"
+        }, {
+            text: "Dashboard",
+            active: true
+        }]
+    });
+
+    var gridRow = element.build().row({
+        render: "div.page-content > div.container",
+        id: "grid_row_id"
+    });
+    var gridCol = element.build().col({
+        id: "grid_row_id",
+        span: "12",
+        render: gridRow
+    });
+
     var grid = require("os-grid");
     grid.build({
-        render:$("#grid")
-    }).render();
-    
-    var element = require("os-element");
+        render: gridCol
+    });
     
     var row = element.build().row({
-        render: "div.page-content > div.container",
+        render: $("div.page-content > div.container"),
         id: "row_id"
     });
     var col1 = element.build().col({
