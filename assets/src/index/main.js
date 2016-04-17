@@ -4,9 +4,9 @@
 define(function (require) {
 
 
-    var element = require("os-element");
+    var elementFactory = require("os-element");
 
-    var breadcrumb = element.build().breadcrumb({
+    var breadcrumb = elementFactory.build().breadcrumb({
         preRender: "div.page-content > div.container",
         items: [{
             text: "Index",
@@ -17,52 +17,43 @@ define(function (require) {
         }]
     });
 
-    var gridRow = element.build().row({
+    var gridRow = elementFactory.build().row({
         render: "div.page-content > div.container",
         id: "grid_row_id"
     });
-    var gridCol = element.build().col({
+    var gridCol = elementFactory.build().col({
         id: "grid_row_id",
         span: "12",
         render: gridRow
     });
-
-    var grid = require("os-grid");
-    grid.build({
+    var gridFactory = require("os-grid");
+    gridFactory.build({
         render: gridCol
     });
-    
-    var row = element.build().row({
+
+    var row = elementFactory.build().row({
         render: $("div.page-content > div.container"),
         id: "row_id"
     });
-    var col1 = element.build().col({
+    var col1 = elementFactory.build().col({
         id: "col_id",
         span: "6",
         render: row
     });
-    var col2 = element.build().col({
+    var col2 = elementFactory.build().col({
         id: "col2_id",
         span: "6",
         render: row
     });
-    var alertDiv = element.build().alert({
+    var alertDiv = elementFactory.build().alert({
         id: "alert_id",
         type: "success",
         message: "成功",
         close: false
     });
     var h4 = $('<h4 class="block">Default Alerts</h4>');
-    var button = element.build().button({
-        cls: "green-haze btn-circle",
-        icon: "fa fa-check",
-        text: "alertSuccess",
-        click: function () {
-            portlet.alert("success", "滚动到我这！", 1000, true);
-        }
-    });
-    var button2 = element.build().button({
-        cls: "green-haze btn-circle",
+    var button2 = elementFactory.build().button({
+        cls: "btn-info",
         icon: "fa fa-user",
         loadAfterClick: true,
         loadText: "等待中...",
@@ -71,13 +62,23 @@ define(function (require) {
         click: function () {
             portlet.alert("info", "滚动到我这！", 1000, true);
             setTimeout(function () {
-                button2.reset();
+                button2.unload();
             }, 2000)
         }
     });
-    var dropdown = element.build().dropdown({
+    var button = elementFactory.build().button({
+        cls: "green-haze btn-circle",
+        icon: "fa fa-check",
+        text: "alertSuccess",
+        click: function () {
+            portlet.alert("success", "滚动到我这！", 1000, true);
+            button2.enable();
+        }
+    });
+    var dropdown = elementFactory.build().dropdown({
         icon: "fa fa-list",
         text: "下拉",
+        cls: "btn-info",
         actions: [{
             text: "滚动提示",
             click: function () {
@@ -92,12 +93,12 @@ define(function (require) {
             }
         }]
     });
-    var portlet = element.build().portlet({
+    var portlet = elementFactory.build().portlet({
         id: "portlet_id",
         title: "我的标题",
         titleIcon: "fa fa-cogs font-green-sharp",
         render: col1,
-        titleAction: [button, button2, dropdown, element.build().button({
+        titleAction: [button, dropdown, elementFactory.build().button({
             cls: "green-haze btn-circle",
             icon: "fa fa-close",
             text: "停止加载",
@@ -108,12 +109,12 @@ define(function (require) {
         })],
         scrollable: true,
         scrollHeight: 400,
-        item: [alertDiv, h4, "aaaaaaaaaaaaa<br/><br/><br/><br/><br/><br/><br/>aaaaa"]
+        item: [button2, alertDiv, h4, "aaaaaaaaaaaaa<br/><br/><br/><br/><br/><br/><br/>aaaaa"]
     }).note("warning", "提示", "这是提示示例");
-    var portlet2 = element.build().portlet({
+    var portlet2 = elementFactory.build().portlet({
         id: "portlet2_id",
         title: "我的标题2",
-        fullscreen: true,
+        fullScreen: true,
         render: col2
-    }).alert("warning", "警告", 2000);
+    }).warning("警告");
 });

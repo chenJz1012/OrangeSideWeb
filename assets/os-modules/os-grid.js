@@ -34,9 +34,8 @@ define("grid", function (require, exports, module, undefined) {
         this.element = element.build().portlet({
             id: "grid",
             title: "表格插件",
-            fullscreen: true
+            fullScreen: true
         }).appendTo(this.renderEle);
-
     }
 
     module.exports = Grid;

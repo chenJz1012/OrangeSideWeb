@@ -77,9 +77,9 @@ define("element", function (require, exports, module, undefined) {
                 action.append(appendObject);
             }
         }
-        if (innerOption.fullscreen) {
-            var fullscreen = $('<a href="javascript:;" class="btn btn-circle btn-default btn-icon-only fullscreen" data-original-title="全屏" title="全屏"></a>');
-            action.append(fullscreen);
+        if (innerOption.fullScreen) {
+            var fullScreen = $('<a href="javascript:;" class="btn btn-circle btn-default btn-icon-only fullscreen" data-original-title="全屏" title="全屏"></a>');
+            action.append(fullScreen);
         }
         if (innerOption.titleIcon != undefined)
             caption.find("i").removeClass().addClass(innerOption.titleIcon);
@@ -252,6 +252,18 @@ define("element", function (require, exports, module, undefined) {
                 Metronic.scrollTo(alert);
             return that;
         };
+        this.success = function (msg, millions) {
+            return this.alert("success", msg, millions == undefined ? 5000 : millions, true);
+        };
+        this.info = function (msg, millions) {
+            return this.alert("info", msg, millions == undefined ? 5000 : millions, true);
+        };
+        this.warning = function (msg, millions) {
+            return this.alert("warning", msg, millions == undefined ? 5000 : millions, true);
+        };
+        this.error = function (msg, millions) {
+            return this.alert("error", msg, millions == undefined ? 5000 : millions, true);
+        };
         this.note = function (type, title, content) {
             var option = {
                 "type": type,
@@ -261,7 +273,15 @@ define("element", function (require, exports, module, undefined) {
             var note = new initNote(option);
             that.body.prepend(note);
             return that;
-        }
+        };
+        this.disable = function () {
+            that.element.addClass("disabled");
+            return that;
+        };
+        this.enable = function () {
+            that.element.removeClass("disabled");
+            return that;
+        };
     };
 
     Element.prototype.row = function (innerOption) {
@@ -345,6 +365,9 @@ define("element", function (require, exports, module, undefined) {
         var that = this;
         this.attributes = innerOption || {};
         var button = $('<button type="button" class="btn">' + (this.attributes.text == undefined ? "按钮" : this.attributes.text) + '</button>');
+        if (this.attributes.cls != undefined) {
+            button.addClass(this.attributes.cls);
+        }
         if (this.attributes.icon != undefined) {
             var icon = initIcon(this.attributes.icon);
             if (this.attributes.iconPosition != undefined) {
@@ -359,6 +382,8 @@ define("element", function (require, exports, module, undefined) {
         }
         if (this.attributes.click != undefined) {
             button.click(function () {
+                if (that.element.hasClass("disabled"))
+                    return;
                 if (that.attributes.loadAfterClick) {
                     var btn = $(this);
                     btn.attr("data-loading-text", (that.attributes.loadText == undefined ? "loading..." : that.attributes.loadText));
@@ -372,7 +397,7 @@ define("element", function (require, exports, module, undefined) {
         this.load = function () {
             that.element.button('loading');
         };
-        this.reset = function () {
+        this.unload = function () {
             that.element.button('reset');
         }
         setAttribute(this, button);
@@ -383,11 +408,16 @@ define("element", function (require, exports, module, undefined) {
     Element.prototype.dropdown = function (innerOption) {
         this.attributes = innerOption || {};
         var btnGroup = $('<div class="btn-group"></div>');
-        var a = $('<a class="btn yellow btn-circle" href="javascript:;" data-toggle="dropdown" aria-expanded="true">'
+        var a = $('<a class="btn" href="javascript:;" data-toggle="dropdown" aria-expanded="true">'
             + (this.attributes.text == undefined ? "按钮" : this.attributes.text) + '<i class="fa fa-angle-down"></i></a>');
         if (this.attributes.icon != undefined) {
             var icon = initIcon(this.attributes.icon);
             a.prepend(icon);
+        }
+        if (this.attributes.cls != undefined) {
+            a.addClass(this.attributes.cls);
+        } else {
+            a.addClass("yellow");
         }
         var dUl = $('<ul class="dropdown-menu pull-right"></ul>');
         if (this.attributes.actions != undefined) {
